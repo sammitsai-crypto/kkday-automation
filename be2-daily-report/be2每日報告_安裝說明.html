@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>be2 每日報告 — 安裝說明</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", sans-serif;
+  background: #f5f7fa; color: #1a1a2e; font-size: 15px; padding: 40px 20px;
+}
+.container { max-width: 760px; margin: 0 auto; }
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 16px; padding: 36px 40px; color: white; margin-bottom: 32px;
+  text-align: center;
+}
+.header h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+.header p { color: rgba(255,255,255,.6); font-size: 14px; }
+.badge {
+  display: inline-block; background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px; padding: 4px 14px; font-size: 12px;
+  color: rgba(255,255,255,.8); margin-bottom: 16px;
+}
+
+/* FILES */
+.files-box {
+  background: white; border-radius: 12px; padding: 24px 28px;
+  margin-bottom: 32px; border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.files-box h2 { font-size: 15px; font-weight: 700; color: #475569; margin-bottom: 16px; text-transform: uppercase; letter-spacing: .5px; }
+.file-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; border-radius: 8px; background: #f8fafc;
+  margin-bottom: 10px; border: 1px solid #e2e8f0;
+}
+.file-row:last-child { margin-bottom: 0; }
+.file-icon { font-size: 22px; flex-shrink: 0; }
+.file-name { font-weight: 700; font-size: 14px; color: #1e40af; }
+.file-desc { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+/* STEPS */
+.steps-title {
+  font-size: 15px; font-weight: 700; color: #475569;
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 16px; padding-left: 4px;
+}
+.step {
+  display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start;
+}
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #1e40af; color: white;
+  font-weight: 800; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.step-body {
+  background: white; border-radius: 10px; padding: 16px 20px;
+  flex: 1; border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.step-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.step-body p { color: #475569; font-size: 14px; line-height: 1.6; }
+.step-body code {
+  display: block; background: #0f172a; color: #7dd3fc;
+  font-family: "SF Mono", monospace; font-size: 12px;
+  padding: 10px 14px; border-radius: 6px; margin-top: 10px;
+  word-break: break-all; white-space: pre-wrap;
+}
+
+/* CONNECTOR */
+.connector {
+  width: 2px; height: 16px; background: #cbd5e1;
+  margin-left: 17px; margin-bottom: 0;
+}
+
+/* TROUBLE */
+.trouble {
+  background: #fff7ed; border: 1px solid #fed7aa;
+  border-radius: 12px; padding: 20px 24px; margin-top: 32px;
+}
+.trouble h2 { font-size: 15px; font-weight: 700; color: #c2410c; margin-bottom: 14px; }
+.trouble-item { margin-bottom: 14px; }
+.trouble-item:last-child { margin-bottom: 0; }
+.trouble-item h4 { font-size: 14px; font-weight: 700; color: #92400e; margin-bottom: 4px; }
+.trouble-item p { font-size: 13px; color: #78350f; line-height: 1.6; }
+.trouble-item code {
+  display: block; background: #1e293b; color: #7dd3fc;
+  font-family: "SF Mono", monospace; font-size: 12px;
+  padding: 8px 12px; border-radius: 6px; margin-top: 6px;
+  word-break: break-all; white-space: pre-wrap;
+}
+
+/* RESULT */
+.result {
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  border-radius: 12px; padding: 20px 24px; margin-top: 20px;
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.result-icon { font-size: 28px; }
+.result h3 { font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+.result p { font-size: 13px; color: #166534; line-height: 1.7; }
+
+/* FOOTER */
+.footer { text-align: center; margin-top: 32px; font-size: 12px; color: #94a3b8; }
+
+@media print {
+  body { background: white; padding: 20px; }
+  .container { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="badge">KKday be2 Internal Tool</div>
+    <h1>be2 每日報告 — 安裝說明</h1>
+    <p>安裝完成後，每天 09:30 自動產生你帳號下的預存金補款報告</p>
+  </div>
+
+  <!-- 需要的檔案 -->
+  <div class="files-box">
+    <h2>需要的檔案（向組長索取）</h2>
+    <div class="file-row">
+      <div class="file-icon">🐍</div>
+      <div>
+        <div class="file-name">be2_daily_report.py</div>
+        <div class="file-desc">主程式（不需要修改）</div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-icon">⚙️</div>
+      <div>
+        <div class="file-name">安裝be2每日報告.command</div>
+        <div class="file-desc">一鍵安裝程式，雙擊執行</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 安裝步驟 -->
+  <div class="steps-title">安裝步驟</div>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h3>將兩個檔案放在同一個資料夾</h3>
+      <p>例如放在「下載項目」（Downloads）或桌面，兩個檔案必須在同一個位置。</p>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>右鍵點 → 「打開」安裝檔</h3>
+      <p>對 <strong>安裝be2每日報告.command</strong> 按右鍵，選「打開」。<br>
+      出現安全性警告時，再按一次「打開」即可。<br><br>
+      ⚠️ 若出現「無法打開」，請見下方疑難排解。</p>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>在終端機輸入你的帳號資訊</h3>
+      <p>終端機會依序詢問：</p>
+      <p style="margin-top:8px;">
+        　▸ <strong>Email</strong>：你的 kkday.com 信箱<br>
+        　▸ <strong>密碼</strong>：be2 登入密碼（輸入時不會顯示，正常現象）<br>
+        　▸ <strong>中文姓名</strong>：顯示在報告上，可留空
+      </p>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h3>等待安裝完成</h3>
+      <p>首次安裝會下載瀏覽器套件（約 3-5 分鐘），請耐心等候。<br>
+      出現「安裝完成！」後，輸入 <strong>y</strong> 立即試跑一次。</p>
+    </div>
+  </div>
+  <div class="connector"></div>
+
+  <div class="step">
+    <div class="step-num" style="background:#16a34a;">✓</div>
+    <div class="step-body">
+      <h3>完成！</h3>
+      <p>桌面會出現兩個捷徑：</p>
+      <p style="margin-top:8px;">
+        　▸ <strong>be2每日報告.command</strong>：手動立即產生報告<br>
+        　▸ <strong>開啟最新報告.command</strong>：開啟最近一份報告
+      </p>
+    </div>
+  </div>
+
+  <!-- 疑難排解 -->
+  <div class="trouble">
+    <h2>⚠️ 常見問題</h2>
+
+    <div class="trouble-item">
+      <h4>「無法打開」/ 無法驗證開發者</h4>
+      <p>前往 系統設定 → 隱私權與安全性，找到被擋的檔案，按「仍要打開」。</p>
+    </div>
+
+    <div class="trouble-item">
+      <h4>permission denied（沒有執行權限）</h4>
+      <p>開啟終端機（Terminal），貼上以下指令：</p>
+      <code>bash ~/Downloads/安裝be2每日報告.command</code>
+    </div>
+
+    <div class="trouble-item">
+      <h4>Playwright 安裝失敗（externally-managed-environment）</h4>
+      <p>開啟終端機，先跑這行再重新執行安裝：</p>
+      <code>pip install playwright --break-system-packages && python3 -m playwright install chromium</code>
+    </div>
+  </div>
+
+  <!-- 成功結果 -->
+  <div class="result">
+    <div class="result-icon">📊</div>
+    <div>
+      <h3>安裝成功後</h3>
+      <p>
+        每天 <strong>早上 09:30</strong> 系統會自動登入你的 be2 帳號，抓取你負責的預存金帳戶資料，產生 HTML 報告並自動開啟。<br><br>
+        報告存放位置：<strong>桌面 → be2 報告</strong> 資料夾
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">KKday 東南亞 OP 組 · be2 Daily Report Tool</div>
+
+</div>
+</body>
+</html>
