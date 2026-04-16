@@ -10,9 +10,9 @@
   {
     "icon": "🚢",
     "name": "Disney Cruise 客服知識庫",
-    "desc": "SCM Disney Cruise 客服知識庫查詢工具。",
+    "desc": "貼上客人或 CS 訊息，自動辨識問題類型並帶出 OP 作業步驟與 CS 回覆範本。",
     "tag": "SCM 組",
     "author": "蔡宜珊",
-    "link": "https://github.com/sammitsai-crypto/disney-cruise-kb"
+    "link": "https://sammitsai-crypto.github.io/disney-cruise-kb/"
   }
 ]
