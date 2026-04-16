@@ -1,0 +1,18 @@
+[
+  {
+    "icon": "📊",
+    "name": "be2 每日報告",
+    "desc": "每天 09:30 自動抓取你帳號下的預存金補款資料，產生 HTML 報告。",
+    "tag": "所有 OP 組員",
+    "author": "蔡宜珊",
+    "link": "./be2-daily-report/be2每日報告_安裝說明.html"
+  },
+  {
+    "icon": "🚢",
+    "name": "Disney Cruise 客服知識庫",
+    "desc": "SCM Disney Cruise 客服知識庫查詢工具。",
+    "tag": "SCM 組",
+    "author": "蔡宜珊",
+    "link": "https://github.com/sammitsai-crypto/disney-cruise-kb"
+  }
+]

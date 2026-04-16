@@ -9,64 +9,141 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", sans-serif;
   background: #f5f7fa; color: #1a1a2e; min-height: 100vh;
-  display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+  padding: 40px 20px;
 }
-.container { max-width: 680px; width: 100%; }
+.container { max-width: 720px; margin: 0 auto; }
+
 .header {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   border-radius: 16px; padding: 40px; color: white;
   text-align: center; margin-bottom: 28px;
 }
-.header .badge {
+.badge {
   display: inline-block; background: rgba(255,255,255,.12);
   border: 1px solid rgba(255,255,255,.2);
   border-radius: 20px; padding: 4px 14px; font-size: 12px;
   color: rgba(255,255,255,.7); margin-bottom: 16px;
 }
 .header h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-.header p { color: rgba(255,255,255,.6); font-size: 14px; }
-.card {
-  background: white; border-radius: 12px; padding: 24px 28px;
-  border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,.06);
-  margin-bottom: 16px; display: flex; gap: 20px; align-items: center;
-  text-decoration: none; color: inherit;
-  transition: box-shadow .2s, transform .2s;
+.header p  { color: rgba(255,255,255,.6); font-size: 14px; }
+
+.search-wrap { margin-bottom: 20px; }
+.search {
+  width: 100%; padding: 12px 16px; border-radius: 10px;
+  border: 1px solid #e2e8f0; font-size: 14px;
+  background: white; outline: none; font-family: inherit;
 }
-.card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.12); transform: translateY(-2px); }
-.card-icon { font-size: 36px; flex-shrink: 0; }
-.card-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; color: #1e40af; }
-.card-desc { font-size: 13px; color: #64748b; line-height: 1.6; }
-.card-arrow { margin-left: auto; color: #94a3b8; font-size: 20px; flex-shrink: 0; }
+.search:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+
+.cards { display: flex; flex-direction: column; gap: 14px; }
+
+.card {
+  background: white; border-radius: 12px; padding: 20px 24px;
+  border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  display: flex; gap: 18px; align-items: center;
+  text-decoration: none; color: inherit;
+  transition: box-shadow .2s, transform .15s;
+}
+.card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.11); transform: translateY(-2px); }
+.card-icon  { font-size: 34px; flex-shrink: 0; }
+.card-body  { flex: 1; min-width: 0; }
+.card-title { font-size: 16px; font-weight: 700; color: #1e40af; margin-bottom: 4px; }
+.card-desc  { font-size: 13px; color: #64748b; line-height: 1.5; }
+.card-meta  {
+  display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;
+}
+.tag {
+  display: inline-block; background: #eff6ff; color: #1d4ed8;
+  font-size: 11px; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px; border: 1px solid #bfdbfe;
+}
+.author {
+  display: inline-block; background: #f0fdf4; color: #166534;
+  font-size: 11px; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px; border: 1px solid #bbf7d0;
+}
+.card-arrow { color: #cbd5e1; font-size: 22px; flex-shrink: 0; }
+
+.empty { text-align: center; padding: 40px; color: #94a3b8; }
+
+.how-to {
+  background: white; border-radius: 12px; padding: 20px 24px;
+  border: 1px solid #e2e8f0; margin-top: 28px;
+}
+.how-to h3 { font-size: 13px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+.how-to ol  { padding-left: 18px; }
+.how-to li  { font-size: 13px; color: #64748b; line-height: 2; }
+.how-to code {
+  background: #f1f5f9; color: #1e40af; font-size: 12px;
+  padding: 1px 6px; border-radius: 4px; font-family: "SF Mono", monospace;
+}
+
 .footer { text-align: center; margin-top: 24px; font-size: 12px; color: #94a3b8; }
+.footer a { color: #94a3b8; }
 </style>
 </head>
 <body>
 <div class="container">
+
   <div class="header">
     <div class="badge">KKday Internal Tools</div>
     <h1>東南亞 OP 自動化工具</h1>
-    <p>點選以下工具查看安裝說明</p>
+    <p>點選工具查看說明 · 想新增工具請編輯 tools.json</p>
   </div>
 
-  <a class="card" href="./be2-daily-report/be2每日報告_安裝說明.html">
-    <div class="card-icon">📊</div>
-    <div>
-      <div class="card-title">be2 每日報告</div>
-      <div class="card-desc">每天 09:30 自動抓取你帳號下的預存金補款資料，產生 HTML 報告。<br>適用：所有 OP 組員</div>
-    </div>
-    <div class="card-arrow">›</div>
-  </a>
+  <div class="search-wrap">
+    <input class="search" id="search" placeholder="搜尋工具名稱或說明…" oninput="filter()">
+  </div>
 
-  <a class="card" href="https://github.com/sammitsai-crypto/disney-cruise-kb" target="_blank">
-    <div class="card-icon">🚢</div>
-    <div>
-      <div class="card-title">Disney Cruise 客服知識庫</div>
-      <div class="card-desc">SCM Disney Cruise 客服知識庫工具。<br>適用：Disney Cruise 相關組員</div>
-    </div>
-    <div class="card-arrow">›</div>
-  </a>
+  <div class="cards" id="cards">
+    <div class="empty">載入中…</div>
+  </div>
 
-  <div class="footer">KKday SEA OP Team · <a href="https://github.com/sammitsai-crypto/kkday-automation" style="color:#94a3b8;">GitHub</a></div>
+  <div class="how-to">
+    <h3>想新增自己的工具？</h3>
+    <ol>
+      <li>進入 <a href="https://github.com/sammitsai-crypto/kkday-automation" target="_blank" style="color:#1e40af;">kkday-automation</a> repo</li>
+      <li>點開 <code>tools.json</code>，按鉛筆圖示編輯</li>
+      <li>照格式新增一筆，填入 icon、name、desc、tag、author、link</li>
+      <li>按 <code>Commit changes</code>，首頁幾分鐘後自動更新</li>
+    </ol>
+  </div>
+
+  <div class="footer">KKday SEA OP Team · <a href="https://github.com/sammitsai-crypto/kkday-automation">GitHub</a></div>
 </div>
+
+<script>
+let tools = [];
+
+fetch('./tools.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(data => { tools = data; render(tools); })
+  .catch(() => {
+    document.getElementById('cards').innerHTML = '<div class="empty">載入失敗，請重新整理</div>';
+  });
+
+function render(list) {
+  const el = document.getElementById('cards');
+  if (!list.length) { el.innerHTML = '<div class="empty">找不到符合的工具</div>'; return; }
+  el.innerHTML = list.map(t => `
+    <a class="card" href="${t.link}" ${t.link.startsWith('http') ? 'target="_blank"' : ''}>
+      <div class="card-icon">${t.icon}</div>
+      <div class="card-body">
+        <div class="card-title">${t.name}</div>
+        <div class="card-desc">${t.desc}</div>
+        <div class="card-meta">
+          ${t.tag    ? `<span class="tag">${t.tag}</span>` : ''}
+          ${t.author ? `<span class="author">by ${t.author}</span>` : ''}
+        </div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>`).join('');
+}
+
+function filter() {
+  const q = document.getElementById('search').value.toLowerCase();
+  render(q ? tools.filter(t => (t.name + t.desc + t.tag + t.author).toLowerCase().includes(q)) : tools);
+}
+</script>
 </body>
 </html>
