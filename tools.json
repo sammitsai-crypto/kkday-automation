@@ -14,5 +14,13 @@
     "tag": "SCM 組",
     "author": "蔡宜珊",
     "link": "https://sammitsai-crypto.github.io/disney-cruise-kb/"
+  },
+  {
+    "icon": "📧",
+    "name": "Supplier Email Generator",
+    "desc": "選擇供應商與 Email 類型，自動產生英文取消／改期／詢問信並直接開啟 Gmail 草稿。支援 Product OID 路由與 CC／BCC 自動帶入。",
+    "tag": "EN Supplier Team",
+    "author": "蔡宜珊",
+    "link": "./supplier-email-tool/"
   }
 ]

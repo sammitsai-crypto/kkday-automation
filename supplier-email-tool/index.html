@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KKday Supplier Email Generator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+
+  .header {
+    background: #1a1a2e;
+    color: white;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header h1 { font-size: 18px; font-weight: 600; }
+  .header span { font-size: 12px; opacity: 0.6; margin-left: auto; }
+
+  .container { max-width: 960px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 14px; font-weight: 600; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 18px; }
+
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #444; }
+  select, input, textarea {
+    width: 100%; padding: 9px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+    font-size: 14px; color: #333; background: #fafafa; transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  select:focus, input:focus, textarea:focus { outline: none; border-color: #4f46e5; background: white; }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .supplier-email-display {
+    font-size: 13px; color: #4f46e5; background: #f0f0ff; border-radius: 6px;
+    padding: 8px 12px; margin-top: 6px; display: none; word-break: break-all;
+  }
+
+  .email-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .type-btn {
+    padding: 10px 8px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white;
+    font-size: 13px; cursor: pointer; text-align: center; transition: all 0.15s; color: #555;
+  }
+  .type-btn:hover { border-color: #4f46e5; color: #4f46e5; }
+  .type-btn.active { border-color: #4f46e5; background: #4f46e5; color: white; font-weight: 500; }
+
+  .generate-btn {
+    width: 100%; padding: 12px; background: #4f46e5; color: white; border: none;
+    border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
+    transition: background 0.15s;
+  }
+  .generate-btn:hover { background: #3730a3; }
+  .generate-btn:disabled { background: #c7c7c7; cursor: not-allowed; }
+
+  .output-card { grid-column: 1 / -1; }
+  .email-preview {
+    background: #f9f9f9; border: 1.5px solid #e0e0e0; border-radius: 8px;
+    padding: 20px; font-size: 14px; line-height: 1.7; white-space: pre-wrap;
+    min-height: 200px; color: #333; font-family: 'Georgia', serif;
+  }
+  .email-preview.empty { color: #aaa; font-style: italic; font-family: inherit; }
+
+  .draft-meta {
+    background: #f0f0ff; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .meta-row { display: flex; align-items: baseline; gap: 10px; }
+  .meta-label { font-size: 11px; font-weight: 700; color: #4f46e5; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; min-width: 52px; }
+  .meta-value { font-size: 13px; color: #333; word-break: break-all; }
+
+  .output-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .open-mail-btn {
+    padding: 10px 20px; background: #4f46e5; color: white; border: none;
+    border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s;
+  }
+  .open-mail-btn:hover:not(:disabled) { background: #3730a3; }
+  .open-mail-btn:disabled { background: #c7c7c7; cursor: not-allowed; }
+  .copy-btn {
+    padding: 10px 20px; background: white; color: #555; border: 1.5px solid #e0e0e0;
+    border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s;
+  }
+  .copy-btn:hover { border-color: #999; }
+  .copy-btn.copied { background: #f3f4f6; color: #6b7280; }
+  .edit-toggle {
+    padding: 10px 20px; background: white; color: #555; border: 1.5px solid #e0e0e0;
+    border-radius: 8px; font-size: 14px; cursor: pointer;
+  }
+  .edit-toggle:hover { border-color: #999; }
+
+  .editable-preview {
+    display: none; width: 100%; min-height: 300px; padding: 20px;
+    border: 1.5px solid #4f46e5; border-radius: 8px; font-size: 14px;
+    line-height: 1.7; font-family: 'Georgia', serif; color: #333;
+  }
+
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 6px; }
+  .tag-weather { background: #dbeafe; color: #1d4ed8; }
+  .tag-personal { background: #fce7f3; color: #be185d; }
+  .tag-reschedule { background: #d1fae5; color: #065f46; }
+  .tag-noshow { background: #fee2e2; color: #b91c1c; }
+  .tag-other { background: #f3f4f6; color: #374151; }
+
+  .hint { font-size: 12px; color: #999; margin-top: 4px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; padding: 0 24px; background: #1a1a2e; }
+  .tab-btn { padding: 10px 20px; background: transparent; color: rgba(255,255,255,0.5); border: none; cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab-btn.active { color: white; border-bottom-color: #818cf8; }
+  .tab-btn:hover { color: rgba(255,255,255,0.85); }
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+
+  /* Manage Suppliers page */
+  .manage-container { max-width: 960px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .full-col { grid-column: 1 / -1; }
+  .product-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .product-row input { margin: 0; }
+  .remove-btn { padding: 8px 10px; background: #fee2e2; color: #b91c1c; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .remove-btn:hover { background: #fecaca; }
+  .add-product-btn { padding: 8px 14px; background: #f3f4f6; color: #555; border: 1.5px dashed #d1d5db; border-radius: 8px; cursor: pointer; font-size: 13px; width: 100%; margin-top: 4px; }
+  .add-product-btn:hover { background: #e5e7eb; }
+  .save-supplier-btn { width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  .save-supplier-btn:hover { background: #3730a3; }
+  .supplier-list-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 16px; border: 1.5px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; }
+  .supplier-list-item .s-info { flex: 1; }
+  .supplier-list-item .s-name { font-weight: 600; font-size: 14px; }
+  .supplier-list-item .s-detail { font-size: 12px; color: #666; margin-top: 4px; }
+  .s-badge { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 10px; background: #e0e7ff; color: #3730a3; margin-right: 4px; }
+  .s-badge.builtin { background: #f3f4f6; color: #6b7280; }
+  .delete-supplier-btn { padding: 6px 12px; background: white; color: #b91c1c; border: 1.5px solid #fecaca; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap; margin-left: 12px; }
+  .delete-supplier-btn:hover { background: #fee2e2; }
+  .product-type-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+  .toggle-btn { padding: 7px 14px; border: 1.5px solid #e0e0e0; border-radius: 6px; background: white; font-size: 13px; cursor: pointer; color: #555; }
+  .toggle-btn.active { border-color: #4f46e5; background: #eef2ff; color: #4f46e5; font-weight: 500; }
+  .product-col-header { display: grid; gap: 8px; margin-bottom: 4px; }
+  .product-col-header span { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.4px; }
+  #oidHeader { grid-template-columns: 1fr 1fr 1fr auto; }
+  #labelHeader { grid-template-columns: 1fr 1fr auto; }
+
+  @media (max-width: 640px) {
+    .container { grid-template-columns: 1fr; }
+    .output-card { grid-column: 1; }
+    .manage-container { grid-template-columns: 1fr; }
+    .full-col { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>📧</div>
+  <h1>KKday Supplier Email Generator</h1>
+  <span>EN Supplier Team</span>
+</div>
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('generator')">✉️ Email Generator</button>
+  <button class="tab-btn" onclick="switchTab('manage')">⚙️ Manage Suppliers</button>
+</div>
+
+<div id="tab-generator" class="tab-page active">
+<div class="container">
+
+  <!-- Left: Supplier + Email Type -->
+  <div class="card">
+    <h2>Supplier Settings</h2>
+
+    <div class="form-group">
+      <label>Supplier Name</label>
+      <select id="supplierSelect" onchange="onSupplierChange()">
+        <option value="">— Select a supplier —</option>
+      </select>
+    </div>
+
+    <div class="form-group" id="productSelectGroup" style="display:none">
+      <label>Product</label>
+      <select id="productSelect" onchange="onProductSelect()">
+        <option value="">— Select a product —</option>
+      </select>
+    </div>
+
+    <div class="supplier-email-display" id="emailDisplay"></div>
+
+    <div class="form-group">
+      <label>Email Type</label>
+      <div class="email-type-grid" id="typeGrid"></div>
+    </div>
+  </div>
+
+  <!-- Right: Order Info -->
+  <div class="card">
+    <h2>Order Details</h2>
+
+    <div class="form-group">
+      <label>KKday Booking No / OID</label>
+      <input type="text" id="orderId" placeholder="e.g. KK-123456789">
+    </div>
+
+    <div class="form-group">
+      <label>Product OID</label>
+      <input type="text" id="supBookingNo" placeholder="e.g. 123456" oninput="onProductOidInput()">
+    </div>
+
+    <div class="form-group">
+      <label>Tour Name <span style="font-weight:400;color:#aaa">(optional)</span></label>
+      <input type="text" id="tourName" placeholder="e.g. Great Barrier Reef Cruise">
+    </div>
+
+    <div class="form-group">
+      <label>Travel Date <span style="font-weight:400;color:#aaa">(optional)</span></label>
+      <input type="date" id="tourDate">
+    </div>
+
+    <div class="form-group">
+      <label>Number of Guests <span style="font-weight:400;color:#aaa">(optional)</span></label>
+      <input type="number" id="paxCount" placeholder="e.g. 2" min="1">
+    </div>
+
+    <div class="form-group" id="extraFieldGroup" style="display:none">
+      <label id="extraFieldLabel">Additional Notes</label>
+      <textarea id="extraField" rows="2" placeholder=""></textarea>
+      <div class="hint" id="extraFieldHint"></div>
+    </div>
+
+    <button class="generate-btn" onclick="generateEmail()">Generate Email</button>
+  </div>
+
+  <!-- Output -->
+  <div class="card output-card">
+    <h2>Email Draft</h2>
+    <div class="draft-meta" id="draftMeta" style="display:none">
+      <div class="meta-row"><span class="meta-label">To</span><span class="meta-value" id="metaTo"></span></div>
+      <div class="meta-row" id="metaCcRow" style="display:none"><span class="meta-label">CC</span><span class="meta-value" id="metaCc"></span></div>
+      <div class="meta-row"><span class="meta-label">BCC</span><span class="meta-value" id="metaBcc"></span></div>
+      <div class="meta-row"><span class="meta-label">Subject</span><span class="meta-value" id="subjectDisplay"></span></div>
+    </div>
+    <div class="email-preview empty" id="emailPreview">Fill in the details above and click "Generate Email"</div>
+    <textarea class="editable-preview" id="editablePreview"></textarea>
+    <div class="output-actions">
+      <button class="open-mail-btn" id="openMailBtn" onclick="openInMail()" disabled>✉️ Open in Mail</button>
+      <button class="copy-btn" id="copyBtn" onclick="copyEmail()">Copy Body</button>
+      <button class="edit-toggle" id="editToggle" onclick="toggleEdit()">✏️ Edit</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// ★ SUPPLIER LIST — add new suppliers here
+//
+// Fields:
+//   email  : default To address
+//   cc     : default CC (optional)
+//   bcc    : default BCC (optional, falls back to DEFAULT_BCC)
+//   products: per-OID overrides → { oid, email, cc }
+// ============================================================
+const DEFAULT_BCC = "op-lsea@kkday.com";
+const FROM_EMAIL  = "op-lsea@kkday.com";
+
+const SUPPLIERS = [
+  { name: "Rottnest Fast Ferries",            region: "AU", email: "bookings@rottnestfastferries.com.au",   products: [] },
+  { name: "Skyrail",                           region: "AU", email: "groups@skyrail.com.au",                 products: [] },
+  { name: "Sea World Cruises",                 region: "AU", email: "bookings@seaworldcruises.com.au",        products: [] },
+  { name: "Big Cat Green Island Reef Cruises", region: "AU", email: "reservations@bigcat-cruises.com.au",     products: [] },
+  { name: "Capta Group Pty Ltd",               region: "AU", email: "reservations@captagroup.com.au",         products: [] },
+  { name: "Sunlover Reef Cruises",             region: "AU", email: "reservations@sunlover.com.au",           products: [] },
+  { name: "Pennicott Wilderness Journeys",     region: "AU", email: "",                                       products: [] },
+  { name: "Skydive Australia",                 region: "AU", email: "agents@skydive.com.au",                  products: [] },
+  { name: "Inflite Group", region: "AU", email: "reservations@inflite.nz", cc: "jian.gao@inflite.nz",
+    products: [
+      { oid: "158517", email: "fly@mtcookskiplanes.com",  cc: "jian.gao@inflite.nz" },
+      { oid: "20130",  email: "fly@mtcookskiplanes.com",  cc: "jian.gao@inflite.nz" },
+      { oid: "168429", email: "fly@mtcookskiplanes.com",  cc: "jian.gao@inflite.nz" },
+      { oid: "166678", email: "fly@mtcookskiplanes.com",  cc: "jian.gao@inflite.nz" },
+      { oid: "126048", email: "jump@skydive.co.nz,reservations@inflite.nz", cc: "jian.gao@inflite.nz" },
+      { oid: "158595", email: "jump@skydivemtcook.com,reservations@inflite.nz", cc: "jian.gao@inflite.nz" },
+      { oid: "158800", email: "jump@skydivefranz.com,reservations@inflite.nz", cc: "jian.gao@inflite.nz" },
+      { oid: "166628", email: "fly@inflitefranz.nz",      cc: "jian.gao@inflite.nz" },
+    ]
+  },
+  { name: "Alpine Guides",                     region: "NZ", email: "info@foxguides.co.nz",                  products: [] },
+  { name: "Totally Tourism",                   region: "NZ", email: "mountcook@helicopter.co.nz",            products: [] },
+  { name: "Skydive Queenstown",                region: "NZ", email: "reservations@nzoneskydive.co.nz",       products: [] },
+  { name: "NGĀI TAHU TOURISM", region: "NZ", email: "",
+    products: [
+      { label: "Shotover Jet",              email: "reservations@shotoverjet.com" },
+      { label: "Franz Josef Glacier Guides",email: "walks@franzjosefglacier.com" },
+      { label: "Dart River Adventures",     email: "reservations@dartriver.co.nz" },
+      { label: "Dark Sky Project",          email: "info@darkskyproject.co.nz" },
+      { label: "Huka Falls Jet",            email: "reservations@hukafallsjet.com" },
+    ]
+  },
+  { name: "Southern Discoveries",              region: "NZ", email: "reservations@southerndiscoveries.co.nz", products: [] },
+  { name: "Lake Wanaka Cruises",               region: "NZ", email: "info@lakewanakacruises.co.nz",          products: [] },
+  { name: "Pure Milford",                      region: "NZ", email: "reservations@puremilford.com",          products: [] },
+  { name: "KLCC@42 MEET & DINE",              region: "MY", email: "",                                       products: [] },
+  { name: "Entrada Travel Group", region: "AU", email: "",
+    products: [
+      { oid: "250882", email: "info@diversden.com.au" },
+      { oid: "157315", email: "info@diversden.com.au" },
+      { oid: "157306", email: "info@spiritofcairns.com.au" },
+    ]
+  },
+  { name: "King Power Mahanakhon",       region: "TH", email: "booking.kpmn@kingpower.com", cc: "bd-th@kkday.com", products: [] },
+  { name: "Ancient City And Erawan Museum", region: "TH", email: "oneeverservice@gmail.com", products: [] },
+  { name: "Waterbom Bali", region: "ID", email: "asst.salesmanager@waterbom-bali.com", products: [] },
+  // ★ Add new suppliers below in the same format ★
+  // Example with per-product-OID routing:
+  // { name: "Example Supplier", region: "AU", email: "default@supplier.com", products: [
+  //   { oid: "111111", email: "product-a@supplier.com", cc: "manager@supplier.com" },
+  // ]},
+];
+
+// ============================================================
+// ★ EMAIL TYPES & TEMPLATES
+// ============================================================
+const EMAIL_TYPES = [
+  {
+    id: "weather",
+    label: "🌧️ Weather Cancellation",
+    tag: "tag-weather",
+    extraLabel: "Weather details (optional)",
+    extraHint: "e.g. typhoon warning, heavy rain forecast",
+    extraPlaceholder: "e.g. tropical storm warning issued",
+    subject: (d) => [d.supplierName, d.supBookingNo, d.orderId].filter(Boolean).join(' / ') + ' Cancellation Request',
+    template: (d) => `Dear Team,
+
+Our guest has requested a cancellation due to adverse weather conditions. Could you please assist with cancelling this reservation and advise on the applicable refund policy? Thank you.${d.extra ? '\n\nNote: ' + d.extra : ''}
+
+Best regards,
+`
+  },
+  {
+    id: "personal",
+    label: "🙋 Personal Cancellation",
+    tag: "tag-personal",
+    extraLabel: "Guest reason (optional)",
+    extraHint: "e.g. illness, personal emergency",
+    extraPlaceholder: "e.g. guest is unwell and unable to travel",
+    subject: (d) => [d.supplierName, d.supBookingNo, d.orderId].filter(Boolean).join(' / ') + ' Cancellation Request',
+    template: (d) => `Dear Team,
+
+Our guest has requested a cancellation for the following booking. Could you please assist with cancelling this reservation? Thank you.${d.extra ? '\n\nNote: ' + d.extra : ''}
+
+Best regards,
+`
+  },
+  {
+    id: "reschedule",
+    label: "📅 Date Change",
+    tag: "tag-reschedule",
+    extraLabel: "New travel date",
+    extraHint: "Enter the requested new date",
+    extraPlaceholder: "e.g. 2026-05-10",
+    subject: (d) => [d.supplierName, d.supBookingNo, d.orderId].filter(Boolean).join(' / ') + ' Date Change Request',
+    template: (d) => `Dear Team,
+
+Our guest would like to request a date change for this booking.${d.tourDate ? ' Original travel date: ' + d.tourDate + '.' : ''} Requested new date: ${d.extra || '[please specify]'}.
+
+Could you please confirm availability and advise on any applicable change fees? Thank you.
+
+Best regards,
+`
+  },
+  {
+    id: "noshow",
+    label: "❌ No Show",
+    tag: "tag-noshow",
+    extraLabel: "Additional notes (optional)",
+    extraHint: "e.g. guest arrived late, missed the departure",
+    extraPlaceholder: "",
+    subject: (d) => [d.supplierName, d.supBookingNo, d.orderId].filter(Boolean).join(' / ') + ' No Show',
+    template: (d) => `Dear Team,
+
+Our guest was unfortunately unable to join the tour on the day. Could you please confirm the no-show status and advise on the applicable policy? Thank you.${d.extra ? '\n\nNote: ' + d.extra : ''}
+
+Best regards,
+`
+  },
+  {
+    id: "enquiry",
+    label: "❓ General Enquiry",
+    tag: "tag-other",
+    extraLabel: "Your enquiry",
+    extraHint: "Describe what you need to ask the supplier",
+    extraPlaceholder: "e.g. Can we add one extra adult to the booking?",
+    subject: (d) => [d.supplierName, d.supBookingNo, d.orderId].filter(Boolean).join(' / ') + ' Enquiry',
+    template: (d) => `Dear Team,
+
+${d.extra ? d.extra + '\n\n' : ''}Could you please advise at your earliest convenience? Thank you.
+
+Best regards,
+`
+  },
+];
+
+// ============================================================
+// App State
+// ============================================================
+
+let selectedType = null;
+let isEditMode = false;
+let generatedDraft = null; // { to, subject, body }
+
+function init() {
+  rebuildSupplierDropdown();
+
+  // Build type buttons
+  const grid = document.getElementById('typeGrid');
+  grid.innerHTML = '';
+  EMAIL_TYPES.forEach(type => {
+    const btn = document.createElement('button');
+    btn.className = 'type-btn';
+    btn.textContent = type.label;
+    btn.onclick = () => selectType(type.id);
+    btn.id = 'btn-' + type.id;
+    grid.appendChild(btn);
+  });
+
+}
+
+function hasLabelProducts(supplier) {
+  return supplier?.products?.length > 0 && supplier.products[0].label;
+}
+
+function resolveEmail() {
+  const name = document.getElementById('supplierSelect').value;
+  const supplier = getAllSuppliers().find(s => s.name === name);
+  if (!supplier) return null;
+
+  if (hasLabelProducts(supplier)) {
+    const selectedLabel = document.getElementById('productSelect').value;
+    const match = supplier.products.find(p => p.label === selectedLabel);
+    if (match) return { email: match.email, cc: match.cc || supplier.cc || '', fromProduct: true, productLabel: match.label };
+    return { email: supplier.email, cc: supplier.cc || '', fromProduct: false };
+  }
+
+  const oid = document.getElementById('supBookingNo').value.trim();
+  if (oid && supplier.products) {
+    const match = supplier.products.find(p => p.oid === oid);
+    if (match) return { email: match.email, cc: match.cc || supplier.cc || '', fromProduct: true };
+  }
+  return { email: supplier.email, cc: supplier.cc || '', fromProduct: false };
+}
+
+function updateEmailDisplay() {
+  const display = document.getElementById('emailDisplay');
+  const resolved = resolveEmail();
+  if (!resolved) { display.style.display = 'none'; return; }
+  const { email, fromProduct } = resolved;
+  display.style.background = '';
+  display.style.color = '';
+  if (email) {
+    display.style.display = 'block';
+    display.style.background = fromProduct ? '#ecfdf5' : '#f0f0ff';
+    display.style.color = fromProduct ? '#065f46' : '#4f46e5';
+    display.textContent = (fromProduct ? '📮 ' : '📮 ') + email;
+  } else {
+    display.style.display = 'block';
+    display.style.background = '#fff7ed';
+    display.style.color = '#c2410c';
+    display.textContent = '⚠️ Select a product or check email manually';
+  }
+}
+
+function onSupplierChange() {
+  const name = document.getElementById('supplierSelect').value;
+  const supplier = getAllSuppliers().find(s => s.name === name);
+  const productGroup = document.getElementById('productSelectGroup');
+  const productSelect = document.getElementById('productSelect');
+  const oidInput = document.getElementById('supBookingNo');
+
+  productSelect.innerHTML = '<option value="">— Select a product —</option>';
+
+  if (supplier && hasLabelProducts(supplier)) {
+    supplier.products.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.label;
+      opt.textContent = p.label;
+      productSelect.appendChild(opt);
+    });
+    productGroup.style.display = 'block';
+    oidInput.value = '';
+  } else {
+    productGroup.style.display = 'none';
+    oidInput.value = '';
+  }
+
+  updateEmailDisplay();
+}
+
+function onProductSelect() {
+  updateEmailDisplay();
+}
+
+function onProductOidInput() {
+  updateEmailDisplay();
+}
+
+function selectType(typeId) {
+  selectedType = typeId;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + typeId).classList.add('active');
+
+  const type = EMAIL_TYPES.find(t => t.id === typeId);
+  const group = document.getElementById('extraFieldGroup');
+  if (type.extraLabel) {
+    group.style.display = 'block';
+    document.getElementById('extraFieldLabel').textContent = type.extraLabel;
+    document.getElementById('extraField').placeholder = type.extraPlaceholder;
+    document.getElementById('extraFieldHint').textContent = type.extraHint;
+  } else {
+    group.style.display = 'none';
+  }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function generateEmail() {
+  const supplierName = document.getElementById('supplierSelect').value;
+  const orderId = document.getElementById('orderId').value.trim() || '[KKday Booking No]';
+  const supBookingNo = document.getElementById('supBookingNo').value.trim();
+  const tourName = document.getElementById('tourName').value.trim();
+  const tourDate = formatDate(document.getElementById('tourDate').value);
+  const pax = document.getElementById('paxCount').value || '[N]';
+  const extra = document.getElementById('extraField').value.trim();
+
+  if (!supplierName) { alert('Please select a supplier.'); return; }
+  if (!selectedType) { alert('Please select an email type.'); return; }
+
+  const supplier = getAllSuppliers().find(s => s.name === supplierName);
+  const selectedProduct = document.getElementById('productSelect').value;
+  const type = EMAIL_TYPES.find(t => t.id === selectedType);
+  const effectiveName = selectedProduct ? `${supplierName} – ${selectedProduct}` : supplierName;
+  const d = { supplierName: effectiveName, orderId, supBookingNo, tourName, tourDate, pax, extra };
+  const body = type.template(d);
+  const subject = type.subject(d);
+
+  const resolved = resolveEmail();
+  const to  = resolved?.email || '';
+  const cc  = resolved?.cc  || supplier?.cc  || '';
+  const bcc = DEFAULT_BCC;
+
+  generatedDraft = { to, cc, bcc, subject, body };
+
+  const preview = document.getElementById('emailPreview');
+  preview.textContent = body;
+  preview.classList.remove('empty');
+  document.getElementById('editablePreview').value = body;
+
+  document.getElementById('metaTo').textContent = to || '(not set)';
+  document.getElementById('metaBcc').textContent = bcc;
+  document.getElementById('metaCc').textContent = cc;
+  document.getElementById('metaCcRow').style.display = cc ? 'flex' : 'none';
+  document.getElementById('subjectDisplay').textContent = subject;
+  document.getElementById('draftMeta').style.display = 'block';
+  document.getElementById('openMailBtn').disabled = false;
+
+  if (isEditMode) {
+    document.getElementById('editablePreview').style.display = 'block';
+    preview.style.display = 'none';
+  }
+}
+
+function openInMail() {
+  if (!generatedDraft) return;
+  const body = isEditMode
+    ? document.getElementById('editablePreview').value
+    : document.getElementById('emailPreview').textContent;
+  const { to, cc, bcc, subject } = generatedDraft;
+  const url = 'https://mail.google.com/mail/?view=cm&fs=1'
+    + '&from='    + encodeURIComponent(FROM_EMAIL)
+    + '&to='      + encodeURIComponent(to)
+    + (cc  ? '&cc='  + encodeURIComponent(cc)  : '')
+    + (bcc ? '&bcc=' + encodeURIComponent(bcc) : '')
+    + '&su='      + encodeURIComponent(subject)
+    + '&body='    + encodeURIComponent(body);
+  window.open(url, '_blank');
+}
+
+function copyEmail() {
+  const content = isEditMode
+    ? document.getElementById('editablePreview').value
+    : document.getElementById('emailPreview').textContent;
+
+  if (!generatedDraft || content === 'Fill in the details above and click "Generate Email"') {
+    alert('Please generate an email first.'); return;
+  }
+
+  navigator.clipboard.writeText(content).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Email'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function toggleEdit() {
+  isEditMode = !isEditMode;
+  const preview = document.getElementById('emailPreview');
+  const editable = document.getElementById('editablePreview');
+  const toggle = document.getElementById('editToggle');
+
+  if (isEditMode) {
+    preview.style.display = 'none';
+    editable.style.display = 'block';
+    toggle.textContent = '👁️ Preview';
+  } else {
+    preview.textContent = editable.value;
+    preview.style.display = 'block';
+    editable.style.display = 'none';
+    toggle.textContent = '✏️ Edit Manually';
+  }
+}
+
+// ============================================================
+// Tab switching
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'manage') renderSupplierList();
+}
+
+// ============================================================
+// localStorage — custom suppliers
+// ============================================================
+const LS_KEY = 'kkday_custom_suppliers';
+
+function loadCustomSuppliers() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+}
+
+function saveCustomSuppliers(list) {
+  localStorage.setItem(LS_KEY, JSON.stringify(list));
+}
+
+function getAllSuppliers() {
+  const custom = loadCustomSuppliers();
+  const builtinNames = new Set(SUPPLIERS.map(s => s.name));
+  return [...SUPPLIERS, ...custom.filter(s => !builtinNames.has(s.name))];
+}
+
+function downloadAndShare() {
+  const custom = loadCustomSuppliers();
+  if (custom.length === 0) { alert('No custom suppliers to export.'); return; }
+
+  const merged = [...SUPPLIERS, ...custom.filter(s => !new Set(SUPPLIERS.map(x => x.name)).has(s.name))];
+  let html = document.documentElement.outerHTML;
+
+  // Bracket-count to find exact end of SUPPLIERS array
+  const start = html.indexOf('const SUPPLIERS = [');
+  let depth = 0, i = start + 'const SUPPLIERS = '.length, end = -1;
+  for (; i < html.length; i++) {
+    if (html[i] === '[') depth++;
+    else if (html[i] === ']') { depth--; if (depth === 0) { end = i + 1; break; } }
+  }
+  if (html[end] === ';') end++;
+  if (start === -1 || end === -1) { alert('Could not update HTML.'); return; }
+
+  const newDecl = 'const SUPPLIERS = ' + JSON.stringify(merged, null, 2) + ';';
+  const newHtml = html.substring(0, start) + newDecl + html.substring(end);
+
+  const blob = new Blob([newHtml], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'supplier_email_tool.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  // Clear custom list — they're now baked into the downloaded file
+  saveCustomSuppliers([]);
+  rebuildSupplierDropdown();
+  renderSupplierList();
+}
+
+// ============================================================
+// Manage Suppliers — product type toggle
+// ============================================================
+let productMode = 'oid'; // 'oid' | 'label'
+
+function setProductMode(mode) {
+  productMode = mode;
+  document.getElementById('btn-oid').classList.toggle('active', mode === 'oid');
+  document.getElementById('btn-label').classList.toggle('active', mode === 'label');
+  document.getElementById('oidHeader').style.display = mode === 'oid' ? 'grid' : 'none';
+  document.getElementById('labelHeader').style.display = mode === 'label' ? 'grid' : 'none';
+  document.getElementById('productRows').innerHTML = '';
+}
+
+function addProductRow() {
+  const container = document.getElementById('productRows');
+  const row = document.createElement('div');
+  row.className = 'product-row';
+  if (productMode === 'oid') {
+    row.style.gridTemplateColumns = '1fr 1fr 1fr auto';
+    row.innerHTML = `
+      <input type="text" placeholder="Product OID" class="pr-oid">
+      <input type="text" placeholder="Email" class="pr-email">
+      <input type="text" placeholder="CC (optional)" class="pr-cc">
+      <button class="remove-btn" onclick="this.parentElement.remove()">✕</button>`;
+  } else {
+    row.style.gridTemplateColumns = '1fr 1fr auto';
+    row.innerHTML = `
+      <input type="text" placeholder="Product Name" class="pr-label">
+      <input type="text" placeholder="Email" class="pr-email">
+      <button class="remove-btn" onclick="this.parentElement.remove()">✕</button>`;
+  }
+  container.appendChild(row);
+}
+
+function saveNewSupplier() {
+  const name   = document.getElementById('newName').value.trim();
+  const region = document.getElementById('newRegion').value;
+  const email  = document.getElementById('newEmail').value.trim();
+  const cc     = document.getElementById('newCc').value.trim();
+  if (!name) { alert('Please enter a supplier name.'); return; }
+
+  const rows = document.querySelectorAll('#productRows .product-row');
+  const products = [];
+  rows.forEach(row => {
+    const emailVal = row.querySelector('.pr-email')?.value.trim();
+    if (!emailVal) return;
+    if (productMode === 'oid') {
+      const oid = row.querySelector('.pr-oid')?.value.trim();
+      const cc2 = row.querySelector('.pr-cc')?.value.trim();
+      if (oid) products.push({ oid, email: emailVal, ...(cc2 ? { cc: cc2 } : {}) });
+    } else {
+      const label = row.querySelector('.pr-label')?.value.trim();
+      if (label) products.push({ label, email: emailVal });
+    }
+  });
+
+  const custom = loadCustomSuppliers();
+  custom.push({ name, region, email, ...(cc ? { cc } : {}), products });
+  saveCustomSuppliers(custom);
+
+  // Reset form
+  document.getElementById('newName').value = '';
+  document.getElementById('newEmail').value = '';
+  document.getElementById('newCc').value = '';
+  document.getElementById('productRows').innerHTML = '';
+
+  // Refresh supplier dropdowns
+  rebuildSupplierDropdown();
+  renderSupplierList();
+  alert(`✓ "${name}" added successfully!`);
+}
+
+function deleteCustomSupplier(index) {
+  if (!confirm('Delete this supplier?')) return;
+  const custom = loadCustomSuppliers();
+  custom.splice(index, 1);
+  saveCustomSuppliers(custom);
+  rebuildSupplierDropdown();
+  renderSupplierList();
+}
+
+function renderSupplierList() {
+  const custom = loadCustomSuppliers();
+  const allContainer = document.getElementById('allSupplierList');
+  allContainer.innerHTML = '';
+
+  const render = (list, isCustom) => list.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'supplier-list-item';
+    const products = (s.products || []).map(p =>
+      `<span class="s-badge">${p.label || p.oid} → ${p.email}</span>`
+    ).join(' ');
+    div.innerHTML = `
+      <div class="s-info">
+        <div class="s-name">${s.name} <span class="s-badge ${isCustom ? '' : 'builtin'}">${s.region}${isCustom ? ' · custom' : ''}</span></div>
+        <div class="s-detail">${s.email ? '📮 ' + s.email : ''}${s.cc ? ' · CC: ' + s.cc : ''}</div>
+        ${products ? '<div class="s-detail" style="margin-top:6px">' + products + '</div>' : ''}
+      </div>
+      ${isCustom ? `<button class="delete-supplier-btn" onclick="deleteCustomSupplier(${i})">Delete</button>` : ''}`;
+    allContainer.appendChild(div);
+  });
+
+  render(SUPPLIERS, false);
+  render(custom, true);
+  document.getElementById('shareCard').style.display = custom.length > 0 ? 'block' : 'none';
+}
+
+function rebuildSupplierDropdown() {
+  const select = document.getElementById('supplierSelect');
+  select.innerHTML = '<option value="">— Select a supplier —</option>';
+
+  const all = getAllSuppliers();
+  const regions = [...new Set(all.map(s => s.region))];
+  regions.forEach(region => {
+    const group = document.createElement('optgroup');
+    group.label = region;
+    all.filter(s => s.region === region).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.name;
+      opt.textContent = s.name;
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
+  });
+}
+
+init();
+</script>
+
+</div><!-- /tab-generator -->
+
+<div id="tab-manage" class="tab-page">
+<div class="manage-container">
+
+  <!-- Add new supplier form -->
+  <div class="card">
+    <h2>Add New Supplier</h2>
+    <div class="form-group">
+      <label>Supplier Name</label>
+      <input type="text" id="newName" placeholder="e.g. Skydive New Zealand">
+    </div>
+    <div class="form-group">
+      <label>Region</label>
+      <select id="newRegion">
+        <option value="AU">AU — Australia</option>
+        <option value="NZ">NZ — New Zealand</option>
+        <option value="SG">SG — Singapore</option>
+        <option value="MY">MY — Malaysia</option>
+        <option value="TH">TH — Thailand</option>
+        <option value="VN">VN — Vietnam</option>
+        <option value="ID">ID — Indonesia</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Default Email <span style="font-weight:400;color:#aaa">(optional if products set)</span></label>
+      <input type="text" id="newEmail" placeholder="e.g. bookings@supplier.com">
+    </div>
+    <div class="form-group">
+      <label>Default CC <span style="font-weight:400;color:#aaa">(optional)</span></label>
+      <input type="text" id="newCc" placeholder="e.g. manager@supplier.com">
+    </div>
+
+    <div class="form-group">
+      <label>Products / OID Routing <span style="font-weight:400;color:#aaa">(optional)</span></label>
+      <div class="product-type-toggle">
+        <button class="toggle-btn active" id="btn-oid" onclick="setProductMode('oid')">By OID</button>
+        <button class="toggle-btn" id="btn-label" onclick="setProductMode('label')">By Product Name</button>
+      </div>
+      <div class="product-col-header" id="oidHeader" style="grid-template-columns:1fr 1fr 1fr auto">
+        <span>OID</span><span>Email</span><span>CC</span><span></span>
+      </div>
+      <div class="product-col-header" id="labelHeader" style="display:none;grid-template-columns:1fr 1fr auto">
+        <span>Product Name</span><span>Email</span><span></span>
+      </div>
+      <div id="productRows"></div>
+      <button class="add-product-btn" onclick="addProductRow()">+ Add row</button>
+    </div>
+
+    <button class="save-supplier-btn" onclick="saveNewSupplier()">Save Supplier</button>
+  </div>
+
+  <!-- Download & Share -->
+  <div class="card full-col" id="shareCard" style="display:none">
+    <h2>Share with Team</h2>
+    <p style="font-size:14px;color:#555;margin-bottom:16px">
+      Custom suppliers are saved in <strong>your browser only</strong>. Click below to download an updated HTML file with all suppliers baked in — then share it on Slack to sync with your team.
+    </p>
+    <button class="save-supplier-btn" style="background:#10b981;max-width:320px" onclick="downloadAndShare()">⬇️ Download Updated HTML</button>
+    <p class="hint" style="margin-top:10px">After sharing, your custom supplier list will be cleared (they're now built into the file).</p>
+  </div>
+
+  <!-- Supplier list -->
+  <div class="card">
+    <h2>All Suppliers</h2>
+    <div id="allSupplierList"></div>
+  </div>
+
+</div>
+</div><!-- /tab-manage -->
+
+</body>
+</html>
